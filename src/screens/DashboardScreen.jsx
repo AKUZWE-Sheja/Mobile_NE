@@ -73,12 +73,12 @@ const DashboardScreen = () => {
         }, {});
 
       const data = Object.entries(sortedCategories).map(([name, value], index) => ({
-        name: `${name === 'Undefined' ? 'RWF -empty-' : name}`,
-        population: value > 0 ? value : 1,
-        color: colors[index % colors.length],
-        legendFontColor: COLORS.text,
-        legendFontSize: 14,
-      }));
+  name: `${name === 'Undefined' ? 'RWF -empty-' : name}`,
+  population: parseFloat(value.toFixed(1)) || 1,
+  color: colors[index % colors.length],
+  legendFontColor: COLORS.text,
+  legendFontSize: 14,
+}));
 
       setChartData(data.length ? data : [{
         name: 'RWF 0.0 -empty-',
