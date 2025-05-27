@@ -1,31 +1,22 @@
-# Vehicle Booking App 🚗✨
+# PFT Mobile App
 
-A mobile app for booking vehicles with React Native.
+A simple React Native app for tracking expenses and budgets.
 
 ## Features
-- ✅ User authentication (login/register)  
-- 🚘 Vehicle browsing & booking  
-- 📅 Booking management  
-- 👤 User profile editing  
+- Add, view, and delete expenses
+- Set and monitor monthly budgets
+- Local notifications when nearing or exceeding budget
 
-## Tech Stack
-- **Frontend**: React Native  
-- **State**: Context API  
-- **Icons**: Lucide React Native  
-- **Styling**: Custom theme system  
-
-## Setup
-1. Clone repo  
-   ```bash
-   git clone https://github.com/NE-Resources-2025/VRS
+## Getting Started
+1. Install dependencies  
+   ```sh
+   npm install
+   ```
+2. Start the app  
+   ```sh
+   npx expo start
    ```
 
-2. Install dependencies
-   ```bash
-      cd VRS && npm install
-   ```
+---
 
-3. Run
-   ```bash
-      npx expo start
-   ```
+Built with Expo and React Native.
