@@ -1,0 +1,38 @@
+Instructions Review
+Read the problem and write designs (first hour):
+I did a Component-Based Architecture with context-driven state management + service abstraction.
+Why?
+Reusable components: InputField, ExpenseCard
+Navigation: Decoupled via AppNavigator.jsx
+Global state: Managed with AuthContext.js
+External API: Handled through api.js services
+What am doing - authentication, API calls, navigation, form validation, and storage- needs separation of concern
+
+
+
+Use React Native ✅
+
+Validate input where applicable:
+LoginScreen: Validates email (non-empty, includes @) and password (non-empty, ≥6 characters).
+CreateExpenseScreen: Validates description (non-empty) and amount (positive number).
+Search in HomeScreen: Sanitizes input using Sanitization.js (trim, lowercase).
+Status: ✅
+
+Handle errors and validations with relevant user messages:
+Validation errors: Shown via Alert.alert (e.g., “Email is required” in LoginScreen, “Enter a valid positive amount” in CreateExpenseScreen).
+API errors: Alerts for network or request failures (e.g., “Failed to load expenses” in HomeScreen, “Failed to create expense” in CreateExpenseScreen).
+Empty states: Messages like “No expenses found” or “No expenses match your search” in HomeScreen.
+Deletion: Confirmation alert before deleting in ExpenseCard.
+Status: ✅
+
+Interact with backend APIs using Axios:
+I used axios for all endpoints in api.js
+GET /users?username=<email> (login)
+POST /expenses (create expense)
+GET /expenses (list expenses)
+GET /expenses/:expenseId (view expense details)
+DELETE /expenses/:expenseId (delete expense)
+Status: ✅
+
+Test mobile application using Expo CLI:
+The app is structured for Expo CLI (npx expo start), with setup instructions provided for running on emulators/devices.
