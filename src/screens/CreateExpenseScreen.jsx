@@ -6,35 +6,43 @@ import Sanitization from '../utils/Sanitization';
 import BudgetUtils from '../utils/BudgetUtils';
 import { COLORS, FONTS, SIZES, SHADOWS } from '../constants/theme';
 
+// This screen lets you add a new expense to your list
 const CreateExpenseScreen = ({ navigation }) => {
+  // State for the form fields and errors
   const [description, setDescription] = useState('');
   const [amount, setAmount] = useState('');
   const [category, setCategory] = useState('');
   const [errors, setErrors] = useState({});
 
+  // Validate the form before submitting
   const validate = () => {
     const newErrors = {};
     if (!Sanitization.isNonEmptyString(description)) newErrors.description = 'Description is required';
     const sanitizedAmount = Sanitization.sanitizeNumber(amount);
     if (!sanitizedAmount) newErrors.amount = 'Enter a valid positive amount';
+    // Category is optional, so no validation needed!
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
+  // Handle the "Create Expense" button press
   const handleCreate = async () => {
     if (!validate()) {
       Alert.alert('Error', errors.description || errors.amount || 'Please correct the errors.');
       return;
     }
     try {
+      // Prepare the expense data to send to the backend
       const expenseData = {
         description: Sanitization.trimString(description),
         amount: Sanitization.sanitizeNumber(amount),
         category: Sanitization.isNonEmptyString(category) ? Sanitization.trimString(category) : '',
         createdAt: new Date().toISOString(),
       };
+      // Actually create the expense
       const response = await createExpense(expenseData);
       console.log('Expense created:', response); // Debug log
+      // Show a success message and go back to the list
       Alert.alert('Success', 'Expense created successfully', [
         {
           text: 'OK',
@@ -43,9 +51,11 @@ const CreateExpenseScreen = ({ navigation }) => {
           },
         },
       ]);
+      // Reset the form fields
       setDescription('');
       setAmount('');
       setCategory('');
+      // Check if a budget notification needs to be sent
       await BudgetUtils.checkBudgetAndNotify('CreateExpense');
     } catch (error) {
       console.error('Failed to create expense:', error.message); // Debug log
@@ -60,6 +70,7 @@ const CreateExpenseScreen = ({ navigation }) => {
     >
       <View style={styles.formContainer}>
         <Text style={styles.title}>Add New Expense</Text>
+        {/* Description input */}
         <InputField
           label="Description"
           value={description}
@@ -67,6 +78,7 @@ const CreateExpenseScreen = ({ navigation }) => {
           placeholder="e.g., Groceries"
           error={errors.description}
         />
+        {/* Amount input */}
         <InputField
           label="Amount (RWF)"
           value={amount}
@@ -75,6 +87,7 @@ const CreateExpenseScreen = ({ navigation }) => {
           keyboardType="numeric"
           error={errors.amount}
         />
+        {/* Category input (optional) */}
         <InputField
           label="Category"
           value={category}
@@ -82,6 +95,7 @@ const CreateExpenseScreen = ({ navigation }) => {
           placeholder="e.g., Food (optional)"
           error={errors.category}
         />
+        {/* Button to create the expense */}
         <TouchableOpacity
           style={[styles.button, { backgroundColor: COLORS.primary }]}
           onPress={handleCreate}
@@ -93,6 +107,7 @@ const CreateExpenseScreen = ({ navigation }) => {
   );
 };
 
+// Styles for a clean, modern look
 const styles = StyleSheet.create({
   container: {
     flex: 1,

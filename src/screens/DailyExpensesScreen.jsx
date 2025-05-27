@@ -8,13 +8,17 @@ import ExpenseCard from '../components/ExpenseCard';
 import Sanitization from '../utils/Sanitization';
 import BudgetUtils from '../utils/BudgetUtils';
 
+// This screen shows your expenses for a specific day.
+// You can pick a date, see what you spent, and delete items if you want.
 const DailyExpensesScreen = ({ navigation }) => {
+  // State for all expenses, filtered expenses, loading spinner, and date picker
   const [expenses, setExpenses] = useState([]);
   const [filteredExpenses, setFilteredExpenses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [date, setDate] = useState(new Date());
   const [showPicker, setShowPicker] = useState(false);
 
+  // Fetch all expenses from the API and filter for the selected date
   const fetchExpenses = async () => {
     try {
       const data = await getExpenses();
@@ -28,6 +32,7 @@ const DailyExpensesScreen = ({ navigation }) => {
     }
   };
 
+  // Filter the expenses for the currently selected date
   const filterExpensesByDate = (data, selectedDate) => {
     if (!data) return;
     const formattedDate = selectedDate.toISOString().split('T')[0]; // e.g., 2025-05-27
@@ -38,6 +43,7 @@ const DailyExpensesScreen = ({ navigation }) => {
     setFilteredExpenses(filtered);
   };
 
+  // Handle when the user picks a new date
   const handleDateChange = (event, selectedDate) => {
     setShowPicker(Platform.OS === 'ios');
     if (selectedDate) {
@@ -46,6 +52,7 @@ const DailyExpensesScreen = ({ navigation }) => {
     }
   };
 
+  // Delete an expense and update the list for the current date
   const handleDelete = async (expenseId) => {
     try {
       await deleteExpense(expenseId);
@@ -59,10 +66,12 @@ const DailyExpensesScreen = ({ navigation }) => {
     }
   };
 
+  // Load expenses when the screen mounts
   useEffect(() => {
     fetchExpenses();
   }, []);
 
+  // Show a spinner while loading
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
@@ -73,9 +82,11 @@ const DailyExpensesScreen = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
+      {/* Header with the screen title */}
       <View style={styles.header}>
         <Text style={styles.headerText}>Daily Expenses</Text>
       </View>
+      {/* Date picker section */}
       <View style={styles.dateContainer}>
         <TouchableOpacity
           style={styles.dateButton}
@@ -86,6 +97,7 @@ const DailyExpensesScreen = ({ navigation }) => {
             {date.toLocaleDateString()}
           </Text>
         </TouchableOpacity>
+        {/* Show the date picker when needed */}
         {showPicker && (
           <DateTimePicker
             value={date}
@@ -96,6 +108,7 @@ const DailyExpensesScreen = ({ navigation }) => {
           />
         )}
       </View>
+      {/* List of expenses for the selected day */}
       <FlatList
         data={filteredExpenses}
         keyExtractor={(item) => item.id}
@@ -106,6 +119,7 @@ const DailyExpensesScreen = ({ navigation }) => {
             onDelete={handleDelete}
           />
         )}
+        // Friendly message if there are no expenses for the day
         ListEmptyComponent={
           <Text style={styles.emptyText}>
             No expenses found for {date.toLocaleDateString()}.
@@ -117,6 +131,7 @@ const DailyExpensesScreen = ({ navigation }) => {
   );
 };
 
+// Styles for a clean, modern look
 const styles = StyleSheet.create({
   container: {
     flex: 1,

@@ -5,18 +5,26 @@ import { COLORS, FONTS, SIZES, SHADOWS, BORDERS } from '../constants/theme';
 import { getExpense, deleteExpense } from '../services/api';
 import { LinearGradient } from 'expo-linear-gradient';
 
+// This screen shows all the details for a single expense.
+// You can also delete the expense from here.
 const ExpenseDetailsScreen = ({ navigation, route }) => {
+  // Grab the expenseId from the navigation route params
   const { expenseId } = route.params;
+
+  // State to hold the expense data, loading status, and deleting status
   const [expense, setExpense] = useState(null);
   const [loading, setLoading] = useState(true);
   const [deleting, setDeleting] = useState(false);
 
+  // Fetch the expense details when the screen loads or expenseId changes
   useEffect(() => {
     const fetchExpense = async () => {
       try {
+        // Try to get the expense details from the API
         const data = await getExpense(expenseId);
         setExpense(data);
       } catch (error) {
+        // If something goes wrong, show an error alert
         Alert.alert('Error', 'Failed to load expense details.');
       } finally {
         setLoading(false);
@@ -25,20 +33,22 @@ const ExpenseDetailsScreen = ({ navigation, route }) => {
     fetchExpense();
   }, [expenseId]);
 
+  // Handle deleting the expense
   const handleDelete = async () => {
+    // Show a confirmation dialog before deleting
     Alert.alert(
       'Delete Expense',
       `Are you sure you want to delete "${expense?.description}"?`,
       [
-        { text: 'Cancel', style: 'cancel' },
+        { text: 'Cancel', style: 'cancel' }, // User can cancel
         {
           text: 'Delete',
           style: 'destructive',
           onPress: async () => {
-            setDeleting(true);
+            setDeleting(true); // Show loading spinner on button
             try {
-              await deleteExpense(expenseId);
-              navigation.goBack();
+              await deleteExpense(expenseId); // Actually delete
+              navigation.goBack(); // Go back to previous screen
               Alert.alert('Success', 'Expense deleted successfully');
             } catch (error) {
               Alert.alert('Error', 'Failed to delete expense.');
@@ -51,6 +61,7 @@ const ExpenseDetailsScreen = ({ navigation, route }) => {
     );
   };
 
+  // If we're still loading, show a spinner
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
@@ -59,6 +70,7 @@ const ExpenseDetailsScreen = ({ navigation, route }) => {
     );
   }
 
+  // If we couldn't find the expense, show a message
   if (!expense) {
     return (
       <View style={styles.container}>
@@ -69,21 +81,9 @@ const ExpenseDetailsScreen = ({ navigation, route }) => {
 
   return (
     <View style={styles.container}>
-      {/* <LinearGradient
-        colors={[COLORS.primary, COLORS.primaryDark]}
-        style={styles.header}
-      >
-        <TouchableOpacity 
-          style={styles.backButton}
-          onPress={() => navigation.goBack()}
-        >
-          <ArrowLeft size={24} color={COLORS.card} />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Expense Details</Text>
-        <View style={{ width: 24 }} /> // Spacer for alignment
-      </LinearGradient> */}
-
+      {/* Card with all the expense info */}
       <View style={styles.card}>
+        {/* Description */}
         <View style={styles.detailItem}>
           <View style={styles.iconContainer}>
             <FileText size={20} color={COLORS.primary} />
@@ -96,6 +96,7 @@ const ExpenseDetailsScreen = ({ navigation, route }) => {
 
         <View style={styles.separator} />
 
+        {/* Amount */}
         <View style={styles.detailItem}>
           <View style={styles.iconContainer}>
             <DollarSign size={20} color={COLORS.primary} />
@@ -103,19 +104,21 @@ const ExpenseDetailsScreen = ({ navigation, route }) => {
           <View style={styles.detailContent}>
             <Text style={styles.detailLabel}>Amount</Text>
             <Text style={[styles.detailValue, styles.amountText]}>
-              RWF {expense.amount.toLocaleString()}
+              RWF {expense.amount.toLocaleDateString()}
             </Text>
           </View>
         </View>
 
         <View style={styles.separator} />
 
+        {/* Category */}
         <View style={styles.detailItem}>
           <View style={styles.iconContainer}>
             <Tag size={20} color={COLORS.primary} />
           </View>
           <View style={styles.detailContent}>
             <Text style={styles.detailLabel}>Category</Text>
+            {/* Show 'Uncategorized' if no category */}
             <Text style={styles.detailValue}>
               {expense.category || 'Uncategorized'}
             </Text>
@@ -124,6 +127,7 @@ const ExpenseDetailsScreen = ({ navigation, route }) => {
 
         <View style={styles.separator} />
 
+        {/* Date */}
         <View style={styles.detailItem}>
           <View style={styles.iconContainer}>
             <Calendar size={20} color={COLORS.primary} />
@@ -142,8 +146,8 @@ const ExpenseDetailsScreen = ({ navigation, route }) => {
         </View>
       </View>
 
+      {/* Delete button at the bottom */}
       <View style={styles.actionButtons}>
-
         <TouchableOpacity
           style={[styles.actionButton, styles.deleteButton]}
           onPress={handleDelete}
@@ -163,6 +167,7 @@ const ExpenseDetailsScreen = ({ navigation, route }) => {
   );
 };
 
+// Styles for the screen
 const styles = StyleSheet.create({
   container: {
     flex: 1,

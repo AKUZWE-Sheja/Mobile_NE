@@ -11,36 +11,38 @@ export const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     const loadUser = async () => {
-      try {
-        const userId = await AsyncStorage.getItem('userId');
-        if (userId) {
-          setUser({ id: userId });
-        }
-      } catch (error) {
-        console.error('Error loading user:', error);
-      }
-    };
+  try {
+    const userId = await AsyncStorage.getItem('userId');
+    const username = await AsyncStorage.getItem('username');
+    if (userId) {
+      setUser({ id: userId, username });
+    }
+  } catch (error) {
+    console.error('Error loading user:', error);
+  }
+};
     loadUser();
   }, []);
 
-  const login = async (email, password) => {
-    setIsLoading(true);
-    try {
-      const users = await loginUser(email);
-      if (users.length === 0 || users[0].password !== password) {
-        throw new Error('Invalid email or password');
-      }
-      const userData = users[0];
-      await AsyncStorage.setItem('userId', userData.id.toString());
-      setUser(userData);
-      return true;
-    } catch (error) {
-      Alert.alert('Error', error.message || 'Login failed. Please check your network or credentials.');
-      return false;
-    } finally {
-      setIsLoading(false);
+const login = async (email, password) => {
+  setIsLoading(true);
+  try {
+    const users = await loginUser(email);
+    if (users.length === 0 || users[0].password !== password) {
+      throw new Error('Invalid email or password');
     }
-  };
+    const userData = users[0];
+    await AsyncStorage.setItem('userId', userData.id.toString());
+    await AsyncStorage.setItem('username', userData.username || userData.email || email); // <-- Add this line
+    setUser(userData);
+    return true;
+  } catch (error) {
+    Alert.alert('Error', error.message || 'Login failed. Please check your network or credentials.');
+    return false;
+  } finally {
+    setIsLoading(false);
+  }
+};
 
   const logout = async () => {
     try {

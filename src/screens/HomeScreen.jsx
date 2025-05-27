@@ -10,14 +10,19 @@ import InputField from '../components/InputField';
 import Sanitization from '../utils/Sanitization';
 import BudgetUtils from '../utils/BudgetUtils';
 
+// The main screen where users see and manage all their expenses
 const HomeScreen = ({ navigation, route }) => {
+  // Auth context for logout
   const { logout } = useAuth();
+
+  // State for all expenses, filtered expenses, search, loading, and refreshing
   const [expenses, setExpenses] = useState([]);
   const [filteredExpenses, setFilteredExpenses] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
 
+  // Fetch expenses from the API
   const fetchExpenses = async () => {
     try {
       const data = await getExpenses();
@@ -32,11 +37,13 @@ const HomeScreen = ({ navigation, route }) => {
     }
   };
 
+  // Pull-to-refresh handler
   const onRefresh = () => {
     setRefreshing(true);
     fetchExpenses();
   };
 
+  // Delete an expense and update the list
   const handleDelete = async (expenseId) => {
     try {
       await deleteExpense(expenseId);
@@ -49,6 +56,7 @@ const HomeScreen = ({ navigation, route }) => {
           ).includes(Sanitization.sanitizeSearchQuery(searchQuery))
         )
       );
+      // Check if budget notifications need to be triggered
       await BudgetUtils.checkBudgetAndNotify('All');
     } catch (error) {
       console.error('Delete expense failed:', error);
@@ -56,6 +64,7 @@ const HomeScreen = ({ navigation, route }) => {
     }
   };
 
+  // Filter expenses based on search query
   const handleSearch = (query) => {
     setSearchQuery(query);
     const sanitizedQuery = Sanitization.sanitizeSearchQuery(query);
@@ -71,11 +80,13 @@ const HomeScreen = ({ navigation, route }) => {
     setFilteredExpenses(filtered);
   };
 
+  // Clear the search box and reset the list
   const clearSearch = () => {
     setSearchQuery('');
     setFilteredExpenses(expenses);
   };
 
+  // Logout with a friendly confirmation
   const handleLogout = () => {
     Alert.alert(
       'Logout',
@@ -95,6 +106,7 @@ const HomeScreen = ({ navigation, route }) => {
     );
   };
 
+  // Load expenses on mount and when coming back from other screens
   useEffect(() => {
     fetchExpenses();
     const unsubscribe = navigation.addListener('focus', () => {
@@ -106,6 +118,7 @@ const HomeScreen = ({ navigation, route }) => {
     return unsubscribe;
   }, [navigation, route.params]);
 
+  // Show a spinner while loading
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
@@ -116,6 +129,7 @@ const HomeScreen = ({ navigation, route }) => {
 
   return (
     <View style={styles.container}>
+      {/* Gradient header with title and action buttons */}
       <LinearGradient
         colors={[COLORS.primary, COLORS.primaryDark]}
         style={styles.header}
@@ -123,18 +137,21 @@ const HomeScreen = ({ navigation, route }) => {
         <View style={styles.headerContent}>
           <Text style={styles.headerText}>Your Expenses</Text>
           <View style={styles.headerActions}>
+            {/* Add new expense button */}
             <TouchableOpacity
               style={styles.addButton}
               onPress={() => navigation.navigate('Add Expense')}
             >
               <Plus size={24} color={COLORS.card} />
             </TouchableOpacity>
+            {/* Logout button */}
             <TouchableOpacity onPress={handleLogout}>
               <LogOut size={24} color={COLORS.card} />
             </TouchableOpacity>
           </View>
         </View>
       </LinearGradient>
+      {/* Search bar */}
       <View style={styles.searchContainer}>
         <InputField
           label=""
@@ -145,12 +162,14 @@ const HomeScreen = ({ navigation, route }) => {
           icon={<Search size={20} color={COLORS.textLight} />}
           containerStyle={styles.searchInput}
         />
+        {/* Show clear button only if there's a search query */}
         {searchQuery.length > 0 && (
           <TouchableOpacity onPress={clearSearch} style={styles.clearButton}>
             <X size={20} color={COLORS.textLight} />
           </TouchableOpacity>
         )}
       </View>
+      {/* List of expenses */}
       <FlatList
         data={filteredExpenses}
         keyExtractor={(item) => item.id}
@@ -161,11 +180,13 @@ const HomeScreen = ({ navigation, route }) => {
             onDelete={handleDelete}
           />
         )}
+        // Show a friendly message if there are no expenses
         ListEmptyComponent={
           <View style={styles.emptyContainer}>
             <Text style={styles.emptyText}>
               {searchQuery ? 'No expenses match your search' : 'No expenses found'}
             </Text>
+            {/* Encourage users to add their first expense */}
             {!searchQuery && (
               <TouchableOpacity
                 style={styles.addFirstButton}
@@ -190,6 +211,7 @@ const HomeScreen = ({ navigation, route }) => {
   );
 };
 
+// Styles for a modern, clean look
 const styles = StyleSheet.create({
   container: {
     flex: 1,

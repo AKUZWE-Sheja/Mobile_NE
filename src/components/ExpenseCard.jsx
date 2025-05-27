@@ -19,8 +19,9 @@ const ExpenseCard = ({ expense, onPress, onDelete }) => {
   };
 
   return (
-    <View style={styles.cardContainer}>
-      <TouchableOpacity style={styles.card} onPress={onPress} activeOpacity={0.9}>
+    <TouchableOpacity style={styles.cardContainer} onPress={onPress} activeOpacity={0.9}>
+      <View style={styles.cardContent}>
+        {/* Left side: category and text */}
         <View style={styles.leftContent}>
           <View style={[
             styles.categoryIcon,
@@ -42,13 +43,15 @@ const ExpenseCard = ({ expense, onPress, onDelete }) => {
             </Text>
           </View>
         </View>
+
+        {/* Right side: amount and date */}
         <View style={styles.rightContent}>
           <Text style={[
-            styles.amount,
-            { color: isOverbudget ? COLORS.error : COLORS.text }
-          ]}>
-            RWF {expense.amount.toLocaleString()}
-          </Text>
+  styles.amount,
+  { color: isOverbudget ? COLORS.error : COLORS.text }
+]}>
+  RWF {(expense.amount ?? 0).toLocaleString()}
+</Text>
           <Text style={styles.date}>
             {new Date(expense.createdAt).toLocaleDateString('en-US', {
               month: 'short',
@@ -56,17 +59,16 @@ const ExpenseCard = ({ expense, onPress, onDelete }) => {
             })}
           </Text>
         </View>
+
+        {/* Chevron */}
         <ChevronRight size={20} color={COLORS.textLight} style={styles.chevron} />
-      </TouchableOpacity>
-      <View style={styles.actionButtons}>
-        <TouchableOpacity
-          style={[styles.actionButton, styles.deleteButton]}
-          onPress={handleDelete}
-        >
-          <Trash2 size={16} color={COLORS.card} />
+
+        {/* Subtle delete button */}
+        <TouchableOpacity onPress={handleDelete} style={styles.deleteButton}>
+          <Trash2 size={18} color={COLORS.error} />
         </TouchableOpacity>
       </View>
-    </View>
+    </TouchableOpacity>
   );
 };
 
@@ -75,11 +77,10 @@ const styles = StyleSheet.create({
     marginHorizontal: SIZES.md,
     marginVertical: SIZES.xs,
     borderRadius: BORDERS.radius.lg,
-    overflow: 'hidden',
+    backgroundColor: COLORS.card,
     ...SHADOWS.sm,
   },
-  card: {
-    backgroundColor: COLORS.card,
+  cardContent: {
     padding: SIZES.md,
     flexDirection: 'row',
     alignItems: 'center',
@@ -133,19 +134,11 @@ const styles = StyleSheet.create({
   chevron: {
     marginLeft: SIZES.sm,
   },
-  actionButtons: {
-    flexDirection: 'row',
-    borderTopWidth: 1,
-    borderTopColor: COLORS.border,
-  },
-  actionButton: {
-    flex: 1,
-    padding: SIZES.sm,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
   deleteButton: {
-    backgroundColor: COLORS.error,
+    marginLeft: SIZES.sm,
+    padding: SIZES.sm,
+    borderRadius: BORDERS.radius.sm,
+    backgroundColor: COLORS.transparent,
   },
 });
 

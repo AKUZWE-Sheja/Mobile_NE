@@ -5,11 +5,14 @@ import InputField from '../components/InputField';
 import Sanitization from '../utils/Sanitization';
 import { COLORS, FONTS, SIZES, SHADOWS } from '../constants/theme';
 
+// This screen lets you set your monthly budget and see what you set for the current month.
 const BudgetScreen = () => {
+  // State for the input, the current budget, and any validation errors
   const [budget, setBudget] = useState('');
   const [currentBudget, setCurrentBudget] = useState(null);
   const [errors, setErrors] = useState({});
 
+  // Loads the budget for the current month from AsyncStorage
   const loadBudget = async () => {
     try {
       const budgetData = await AsyncStorage.getItem('budget');
@@ -25,6 +28,7 @@ const BudgetScreen = () => {
     }
   };
 
+  // Checks if the budget input is valid (must be a positive number)
   const validate = () => {
     const newErrors = {};
     const sanitizedBudget = Sanitization.sanitizeNumber(budget);
@@ -35,12 +39,14 @@ const BudgetScreen = () => {
     return Object.keys(newErrors).length === 0;
   };
 
+  // Handles the "Set Budget" button press
   const handleSetBudget = async () => {
     if (!validate()) {
       Alert.alert('Error', errors.budget);
       return;
     }
     try {
+      // Save the budget for the current month
       const budgetData = {
         amount: Sanitization.sanitizeNumber(budget),
         period: new Date().toISOString().slice(0, 7), // YYYY-MM
@@ -54,21 +60,25 @@ const BudgetScreen = () => {
     }
   };
 
+  // Load the budget when the screen first loads
   useEffect(() => {
     loadBudget();
   }, []);
 
   return (
     <View style={styles.container}>
+      {/* Header with a splash of color */}
       <View style={styles.header}>
         <Text style={styles.headerText}>Set Monthly Budget</Text>
       </View>
       <View style={styles.formContainer}>
+        {/* Show the current month's budget if it exists */}
         {currentBudget && (
           <Text style={styles.currentBudgetText}>
             Current Budget: RWF {currentBudget} for {new Date().toISOString().slice(0, 7)}
           </Text>
         )}
+        {/* Input for new budget */}
         <InputField
           label="Budget Amount (RWF)"
           value={budget}
@@ -77,6 +87,7 @@ const BudgetScreen = () => {
           keyboardType="numeric"
           error={errors.budget}
         />
+        {/* Button to save the budget */}
         <TouchableOpacity
           style={[styles.button, { backgroundColor: COLORS.primary }]}
           onPress={handleSetBudget}
@@ -88,6 +99,7 @@ const BudgetScreen = () => {
   );
 };
 
+// Styles for a clean, modern look
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -132,5 +144,3 @@ const styles = StyleSheet.create({
 });
 
 export default BudgetScreen;
-
-
